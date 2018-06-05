@@ -1,10 +1,11 @@
-﻿// Learn more about F# at http://fsharp.org
-open Argu
+﻿open Argu
 open System
 
 let writeAllLines = 
     (IO.File.WriteAllLines :(string*string seq)->unit) 
     |> FuncConvert.FuncFromTupled
+
+let toUpper (s:string) = s.ToUpper();
 
 type CLIArguments =
     | [<MainCommand;First>] Count of count:UInt32
@@ -32,12 +33,9 @@ let main argv =
         
     let output = results.TryGetResult<String> Output
 
-    let gFunc =        
-        if Char.IsUpper(format.[0]) then
-            fun _ -> Guid.NewGuid().ToString(format).ToUpper()
-        else 
-            fun _ -> Guid.NewGuid().ToString(format)
-
+    let gFunc =       
+        fun _ -> Guid.NewGuid().ToString(format)
+        >> if Char.IsUpper(format.[0]) then toUpper else id
 
     [1..count |> int] 
     |> Seq.map gFunc
